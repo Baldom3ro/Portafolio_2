@@ -1,0 +1,9 @@
+# Archivos de contexto y notas personales
+context.md
+
+# Archivos del sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
