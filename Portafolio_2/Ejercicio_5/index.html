@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 5 - Caché Dinámica con Fallback a IndexedDB | Portafolio 2 PWA</title>
+  
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <a href="../index.html" class="brand">
+        <span class="brand-icon">🔄</span>
+        <span>Ejercicio 5: Network-First & IndexedDB Fallback</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="../Ejercicio_4/index.html" class="nav-btn">← Ejercicio 4</a></li>
+          <li><a href="../index.html" class="nav-btn primary">Volver al Portafolio</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Intro -->
+    <div class="hero">
+      <span class="hero-badge">PWA Architecture • Resilient Data Fetching</span>
+      <h1 class="hero-title">Estrategia Network-First con Fallback a IndexedDB</h1>
+      <p class="hero-subtitle">
+        Consumo de API REST remota con <code>fetch</code>. Al recibir el JSON, se respalda automáticamente en <strong>IndexedDB</strong>. Si la red falla o se pierde la conexión, la interfaz recupera y renderiza el último estado almacenado localmente de forma transparente.
+      </p>
+    </div>
+
+    <!-- Interactive Strategy Toolbar -->
+    <section class="card" style="margin-bottom: 1.5rem;">
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+        
+        <!-- API Endpoint Selector -->
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <label class="form-label" style="margin: 0; font-weight: 600;" for="selEndpoint">Fuente API:</label>
+          <select id="selEndpoint" class="form-control" style="width: 250px;">
+            <option value="https://dummyjson.com/products?limit=12">Productos Catálogo (DummyJSON)</option>
+            <option value="https://jsonplaceholder.typicode.com/posts?_limit=12">Publicaciones Blog (JSONPlaceholder)</option>
+          </select>
+          <button id="btnFetchData" class="btn btn-primary">
+            🔄 Actualizar Datos (Fetch)
+          </button>
+        </div>
+
+        <!-- Offline Simulator Switch & Actions -->
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <div class="switch-container">
+            <span style="font-size: 0.85rem; font-weight: 600;">Simular Sin Red:</span>
+            <label class="switch-toggle" title="Forzar fallo de red para probar el fallback a IndexedDB sin apagar el WiFi">
+              <input type="checkbox" id="chkSimulateOffline">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <button id="btnClearCache" class="btn btn-secondary btn-sm" title="Vaciar datos guardados en IndexedDB">
+            🗑️ Vaciar Caché Local
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Dynamic Status Banner (Indicates whether data came from Network or IndexedDB) -->
+    <div id="originBanner" class="status-hero-banner banner-network">
+      <div class="banner-left">
+        <span id="bannerIcon" class="banner-icon">🟢</span>
+        <div>
+          <h3 id="bannerTitle" class="banner-title">DATOS EN VIVO DESDE LA RED (Network-First)</h3>
+          <p id="bannerDesc" class="banner-desc">
+            Respuesta obtenida directamente del servidor remoto. Se guardó una copia de respaldo en IndexedDB.
+          </p>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <span id="sourcePill" class="badge badge-granted" style="font-size: 0.85rem; padding: 0.4rem 0.9rem;">
+          ONLINE • RED
+        </span>
+      </div>
+    </div>
+
+    <!-- Telemetry Cards -->
+    <div class="coords-grid" style="margin-bottom: 1.5rem;">
+      <div class="stat-card">
+        <span class="stat-label">Origen Actual</span>
+        <span class="stat-value" id="valSource" style="color: #4ade80;">RED</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Tiempo de Respuesta</span>
+        <span class="stat-value" id="valLatency">-- ms</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Elementos Mostrados</span>
+        <span class="stat-value" id="valItemCount">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Último Respaldo en IndexedDB</span>
+        <span class="stat-value" id="valLastSaved" style="font-size: 0.85rem; color: #94a3b8;">--</span>
+      </div>
+    </div>
+
+    <!-- Data Display Grid -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span class="icon">📦</span>
+          <span>Contenido Renderizado</span>
+        </h2>
+        <span id="itemsTimestampBadge" class="badge badge-secondary" style="font-size: 0.75rem;">
+          Sincronizado: --
+        </span>
+      </div>
+
+      <!-- Feed Container -->
+      <div id="itemsContainer" class="items-grid">
+        <p style="grid-column: 1 / -1; text-align: center; color: var(--text-dim); padding: 3rem;">
+          Iniciando carga de datos remotos...
+        </p>
+      </div>
+    </section>
+
+    <!-- Technical Flow Diagram & Code -->
+    <section class="card" style="margin-top: 1.5rem;">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span class="icon">📐</span>
+          <span>Flujo de Ejecución de la Estrategia Network-First con Fallback</span>
+        </h2>
+      </div>
+
+      <pre class="code-box"><code>async function fetchWithIndexedDbFallback(endpoint) {
+  // 1. Intentar obtener datos frescos desde la RED
+  try {
+    if (simularOffline) throw new Error('Simulación de red caída');
+    
+    const response = await fetch(endpoint, { cache: 'no-cache' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+
+    // 2. Éxito en Red: Guardar copia fresca en IndexedDB
+    await apiCacheDB.saveApiResponse(endpoint, data);
+    renderInterface(data, 'NETWORK');
+  } 
+  // 3. Fallo en Red (Sin internet o servidor caído): Activar FALLBACK
+  catch (networkError) {
+    console.warn('Red no disponible. Leyendo respaldo desde IndexedDB...');
+    const localBackup = await apiCacheDB.getCachedResponse(endpoint);
+
+    if (localBackup) {
+      // 4. Renderizar automáticamente los datos cacheados
+      renderInterface(localBackup.payload, 'INDEXEDDB_FALLBACK', localBackup.timestamp);
+    } else {
+      renderEmptyState('Sin conexión y sin respaldo local previo.');
+    }
+  }
+}</code></pre>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>Portafolio de Ejercicios 2 • PWA Avanzado • <strong>Ejercicio 5</strong></p>
+    </div>
+  </footer>
+
+  <!-- IndexedDB Storage & App -->
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portafolio 2 - Capacidades Avanzadas de PWA</title>
+  
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .exercise-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exercise-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), var(--shadow-glow);
+    }
+
+    .exercise-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0.8;
+    }
+
+    .exercise-number {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #60a5fa;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .exercise-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .exercise-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tech-tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #94a3b8;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <a href="./index.html" class="brand">
+        <span class="brand-icon">⚡</span>
+        <span>Portafolio de Ejercicios 2 • PWA Avanzado</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="https://github.com/Baldom3ro/Portafolio_2" target="_blank" class="nav-btn">GitHub Repo ↗</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Intro -->
+    <div class="hero">
+      <span class="hero-badge">Aplicaciones Web Progresivas • Unidad 2</span>
+      <h1 class="hero-title">Portafolio de Ejercicios 2: Capacidades Avanzadas</h1>
+      <p class="hero-subtitle">
+        Implementación práctica de gestión de permisos explícitos, hardware Web APIs (GPS y cámara), notificaciones locales desde el Service Worker, persistencia offline con IndexedDB y resiliencia dinámica Network-First.
+      </p>
+    </div>
+
+    <!-- 5 Exercises Grid -->
+    <div class="grid-3" style="margin-top: 1rem;">
+      
+      <!-- Ejercicio 1 -->
+      <article class="exercise-card">
+        <div>
+          <div class="exercise-number">
+            <span>📍</span>
+            <span>Ejercicio 1</span>
+          </div>
+          <h2 class="exercise-title">Consulta de Permisos y Geolocalización</h2>
+          <p class="exercise-desc">
+            Verificación de estados (granted, prompt, denied) con <code>Permissions API</code> y captura satelital de coordenadas GPS desplegadas en mapa interactivo con Leaflet y OpenStreetMap.
+          </p>
+          <div class="tech-tags">
+            <span class="tech-tag">Permissions API</span>
+            <span class="tech-tag">Geolocation API</span>
+            <span class="tech-tag">Leaflet.js</span>
+            <span class="tech-tag">onchange</span>
+          </div>
+        </div>
+        <a href="Ejercicio_1/index.html" class="btn btn-primary" style="width: 100%;">
+          Abrir Ejercicio 1 →
+        </a>
+      </article>
+
+      <!-- Ejercicio 2 -->
+      <article class="exercise-card">
+        <div>
+          <div class="exercise-number">
+            <span>📷</span>
+            <span>Ejercicio 2</span>
+          </div>
+          <h2 class="exercise-title">Captura de Medios con Cámara Web/Móvil</h2>
+          <p class="exercise-desc">
+            Acceso al sensor óptico mediante <code>getUserMedia</code>, renderizado del flujo en vivo en <code>&lt;video&gt;</code> y congelamiento de fotogramas estáticos en un <code>&lt;canvas&gt;</code> con filtros gráficos y descarga.
+          </p>
+          <div class="tech-tags">
+            <span class="tech-tag">getUserMedia</span>
+            <span class="tech-tag">HTML5 Video</span>
+            <span class="tech-tag">Canvas 2D</span>
+            <span class="tech-tag">Filtros & PNG</span>
+          </div>
+        </div>
+        <a href="Ejercicio_2/index.html" class="btn btn-primary" style="width: 100%;">
+          Abrir Ejercicio 2 →
+        </a>
+      </article>
+
+      <!-- Ejercicio 3 -->
+      <article class="exercise-card">
+        <div>
+          <div class="exercise-number">
+            <span>🔔</span>
+            <span>Ejercicio 3</span>
+          </div>
+          <h2 class="exercise-title">Notificaciones Push Locales con Service Worker</h2>
+          <p class="exercise-desc">
+            Petición de permisos con <code>Notification.requestPermission</code> y disparo de notificaciones enriquecidas con título, cuerpo, icono, vibración y acciones gestionadas por el Service Worker.
+          </p>
+          <div class="tech-tags">
+            <span class="tech-tag">Notification API</span>
+            <span class="tech-tag">Service Worker</span>
+            <span class="tech-tag">showNotification</span>
+            <span class="tech-tag">Vibration API</span>
+          </div>
+        </div>
+        <a href="Ejercicio_3/index.html" class="btn btn-primary" style="width: 100%;">
+          Abrir Ejercicio 3 →
+        </a>
+      </article>
+
+      <!-- Ejercicio 4 -->
+      <article class="exercise-card">
+        <div>
+          <div class="exercise-number">
+            <span>🗄️</span>
+            <span>Ejercicio 4</span>
+          </div>
+          <h2 class="exercise-title">Persistencia Asíncrona con IndexedDB</h2>
+          <p class="exercise-desc">
+            Creación de base de datos transaccional con Object Store e índices nativos. Interfaz CRUD completa para insertar, consultar, editar y eliminar datos locales sin conexión a internet.
+          </p>
+          <div class="tech-tags">
+            <span class="tech-tag">IndexedDB</span>
+            <span class="tech-tag">Object Store</span>
+            <span class="tech-tag">Transacciones</span>
+            <span class="tech-tag">CRUD Offline</span>
+          </div>
+        </div>
+        <a href="Ejercicio_4/index.html" class="btn btn-primary" style="width: 100%;">
+          Abrir Ejercicio 4 →
+        </a>
+      </article>
+
+      <!-- Ejercicio 5 -->
+      <article class="exercise-card">
+        <div>
+          <div class="exercise-number">
+            <span>🔄</span>
+            <span>Ejercicio 5</span>
+          </div>
+          <h2 class="exercise-title">Estrategia Network-First con Fallback a IndexedDB</h2>
+          <p class="exercise-desc">
+            Consumo de API REST remota con <code>fetch</code> y respaldo automático en IndexedDB. En caso de corte o desconexión de red, la interfaz recupera y renderiza el último JSON almacenado.
+          </p>
+          <div class="tech-tags">
+            <span class="tech-tag">Network-First</span>
+            <span class="tech-tag">Fetch API</span>
+            <span class="tech-tag">IndexedDB Fallback</span>
+            <span class="tech-tag">Simulador Offline</span>
+          </div>
+        </div>
+        <a href="Ejercicio_5/index.html" class="btn btn-primary" style="width: 100%;">
+          Abrir Ejercicio 5 →
+        </a>
+      </article>
+
+      <!-- Project Architecture Overview Card -->
+      <article class="exercise-card" style="background: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.3);">
+        <div>
+          <div class="exercise-number">
+            <span>📚</span>
+            <span>Resumen Técnico</span>
+          </div>
+          <h2 class="exercise-title">Arquitectura PWA</h2>
+          <p class="exercise-desc">
+            Cada ejercicio está diseñado como un módulo autónomo, modular y desacoplado, con código documentado, manejo de excepciones y cumplimiento estricto de las directivas del portafolio.
+          </p>
+          <div class="tech-tags">
+            <span class="tech-tag">Vanilla JS ES6+</span>
+            <span class="tech-tag">Design System</span>
+            <span class="tech-tag">Responsive</span>
+          </div>
+        </div>
+        <a href="https://github.com/Baldom3ro/Portafolio_2" target="_blank" class="btn btn-secondary" style="width: 100%;">
+          Ver Repositorio GitHub ↗
+        </a>
+      </article>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>Portafolio de Ejercicios 2 • Aplicaciones Web Progresivas • Repositorio: <a href="https://github.com/Baldom3ro/Portafolio_2" target="_blank">github.com/Baldom3ro/Portafolio_2</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+/* Specific styles for Ejercicio 1 */
+#mapContainer {
+  height: 420px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+  background: #1e293b;
+  z-index: 1;
+}
+
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 2rem;
+}
+
+.map-placeholder .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--text-dim);
+}
+
+.coords-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.permission-pill {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding: 0.35rem 0.85rem;
+}
+
+.other-permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.perm-item {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.perm-item span {
+  font-size: 0.85rem;
+  font-weight: 500;
+}

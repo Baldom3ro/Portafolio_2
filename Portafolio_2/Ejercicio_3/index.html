@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 3 - Notificaciones Push Locales con Service Worker | Portafolio 2 PWA</title>
+  
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <a href="../index.html" class="brand">
+        <span class="brand-icon">🔔</span>
+        <span>Ejercicio 3: Notificaciones Push Locales</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="../Ejercicio_2/index.html" class="nav-btn">← Ejercicio 2</a></li>
+          <li><a href="../index.html" class="nav-btn">Portafolio</a></li>
+          <li><a href="../Ejercicio_4/index.html" class="nav-btn primary">Siguiente (IndexedDB) →</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Intro -->
+    <div class="hero">
+      <span class="hero-badge">Web APIs • Service Worker & Notifications</span>
+      <h1 class="hero-title">Notificaciones Push Locales desde el Service Worker</h1>
+      <p class="hero-subtitle">
+        Solicitud explícita de permisos con <code>Notification.requestPermission</code> y disparo de notificaciones enriquecidas con título, cuerpo, icono, vibración y acciones ejecutadas a través de <code>self.registration.showNotification</code>.
+      </p>
+    </div>
+
+    <!-- Feedback Alerts -->
+    <div id="notifAlert" class="alert alert-info" style="display: none;">
+      <span class="alert-icon">ℹ️</span>
+      <span id="notifAlertMsg">Listo.</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Left Column: Permissions & Notification Creator Form -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Service Worker & Permission Status -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">⚙️</span>
+              <span>Estado del Service Worker y Permisos</span>
+            </h2>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.4); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+              <span>Service Worker (sw.js):</span>
+              <span id="swBadge" class="badge badge-warning">
+                <span class="badge-dot"></span>
+                <span id="swBadgeText">Registrando...</span>
+              </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.4); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+              <span>Permiso Notification API:</span>
+              <span id="permBadge" class="badge badge-prompt">
+                <span class="badge-dot"></span>
+                <span id="permBadgeText">default</span>
+              </span>
+            </div>
+          </div>
+
+          <button id="btnRequestPermission" class="btn btn-primary" style="width: 100%;">
+            🛡️ Solicitar Permiso de Notificación (Notification.requestPermission)
+          </button>
+        </section>
+
+        <!-- Notification Builder Form -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">✍️</span>
+              <span>Diseñador de Notificación Personalizada</span>
+            </h2>
+          </div>
+
+          <!-- Presets -->
+          <div style="margin-bottom: 1rem;">
+            <label class="form-label">Plantillas rápidas:</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+              <button type="button" class="preset-chip" id="presetRecordatorio">📅 Recordatorio PWA</button>
+              <button type="button" class="preset-chip" id="presetAlerta">⚠️ Alerta de Sistema</button>
+              <button type="button" class="preset-chip" id="presetMensaje">💬 Mensaje Nuevo</button>
+            </div>
+          </div>
+
+          <form id="notifForm">
+            <div class="form-group">
+              <label class="form-label" for="inpTitle">Título de la Notificación (*):</label>
+              <input type="text" id="inpTitle" class="form-control" value="🚀 ¡Notificación Push Local PWA!" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inpBody">Cuerpo / Mensaje (*):</label>
+              <textarea id="inpBody" class="form-control" rows="2" required>Esta notificación fue despachada y ejecutada por el evento showNotification del Service Worker.</textarea>
+            </div>
+
+            <div class="grid-2" style="gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <label class="form-label" for="selIcon">Icono:</label>
+                <select id="selIcon" class="form-control">
+                  <option value="./icon.svg">Campana PWA (SVG)</option>
+                  <option value="./icon-192.png">Campana PWA (PNG 192px)</option>
+                  <option value="https://cdn-icons-png.flaticon.com/512/1828/1828640.png">Estrella Dorada (Web)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label" for="inpVibration">Patrón de Vibración (ms):</label>
+                <input type="text" id="inpVibration" class="form-control" value="200, 100, 200" placeholder="Ej: 200, 100, 200">
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <label class="form-label" for="inpTag">Tag de Notificación:</label>
+                <input type="text" id="inpTag" class="form-control" value="pwa-notif-v1">
+              </div>
+
+              <div>
+                <label class="form-label" for="selDelay">Retardo de Envío:</label>
+                <select id="selDelay" class="form-control">
+                  <option value="0">Inmediato (0 seg)</option>
+                  <option value="3000">En 3 segundos (permite cambiar de app)</option>
+                  <option value="5000">En 5 segundos</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="chkActions" checked style="accent-color: var(--primary);">
+                <span>Incluir botones de acción interactivos (<code>actions: ['Ver', 'Cerrar']</code>)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; margin-top: 0.4rem;">
+                <input type="checkbox" id="chkRenotify" checked style="accent-color: var(--primary);">
+                <span>Re-notificar si el tag se repite (<code>renotify: true</code>)</span>
+              </label>
+            </div>
+
+            <div class="btn-group">
+              <button type="submit" id="btnSendViaSW" class="btn btn-primary" style="flex: 1;">
+                🚀 Disparar Notificación con Service Worker
+              </button>
+            </div>
+          </form>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Live Mockup Preview & Technical Architecture -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Notification OS Mockup -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">📱</span>
+              <span>Vista Previa en el Sistema Operativo</span>
+            </h2>
+            <span class="badge badge-info">Simulación en vivo</span>
+          </div>
+
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            Así se visualizará la notificación nativa en la bandeja del sistema (Windows / macOS / Android):
+          </p>
+
+          <div class="notification-mockup">
+            <img id="previewIcon" src="./icon.svg" alt="Icono" class="notif-icon-preview">
+            <div class="notif-content-preview">
+              <div class="notif-header-preview">
+                <span class="notif-app-name">Portafolio 2 PWA • Ahora</span>
+                <span class="notif-time">12:00</span>
+              </div>
+              <h4 id="previewTitle" class="notif-title-preview">🚀 ¡Notificación Push Local PWA!</h4>
+              <p id="previewBody" class="notif-body-preview">
+                Esta notificación fue despachada y ejecutada por el evento showNotification del Service Worker.
+              </p>
+              <div id="previewActions" class="notif-actions-preview">
+                <span class="notif-action-btn-mock">🔍 Ver Detalles</span>
+                <span class="notif-action-btn-mock">✖️ Descartar</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info" style="font-size: 0.85rem;">
+            <span>💡</span>
+            <div>
+              <strong>Prueba fuera del navegador:</strong> Selecciona el retardo <em>"En 5 segundos"</em>, haz clic en Disparar, minimiza esta ventana o cambia de pestaña. La notificación aparecerá nativamente en tu sistema operativo y al hacer clic volverá a enfocar esta aplicación.
+            </div>
+          </div>
+        </section>
+
+        <!-- Technical Explanation Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">💻</span>
+              <span>Implementación Service Worker (showNotification)</span>
+            </h2>
+          </div>
+
+          <pre class="code-box"><code>// 1. Solicitud de permiso en app.js
+const permission = await Notification.requestPermission();
+
+// 2. Registro y obtención del Service Worker
+const registration = await navigator.serviceWorker.ready;
+
+// 3. Disparo de notificación local enriquecida
+registration.showNotification(title, {
+  body: 'Texto descriptivo...',
+  icon: './icon-192.png',
+  badge: './icon.svg',
+  vibrate: [200, 100, 200],
+  tag: 'pwa-alerta',
+  renotify: true,
+  actions: [
+    { action: 'explore', title: 'Ver Detalles' },
+    { action: 'dismiss', title: 'Cerrar' }
+  ]
+});
+
+// 4. En sw.js se atiende el clic:
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  if (event.action === 'explore') {
+    event.waitUntil(clients.openWindow('./'));
+  }
+});</code></pre>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>Portafolio de Ejercicios 2 • PWA Avanzado • <strong>Ejercicio 3</strong></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

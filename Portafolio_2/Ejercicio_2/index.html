@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 2 - Captura de Medios con Cámara Web/Móvil | Portafolio 2 PWA</title>
+  
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <a href="../index.html" class="brand">
+        <span class="brand-icon">📷</span>
+        <span>Ejercicio 2: Captura de Medios con Cámara</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="../Ejercicio_1/index.html" class="nav-btn">← Ejercicio 1</a></li>
+          <li><a href="../index.html" class="nav-btn">Portafolio</a></li>
+          <li><a href="../Ejercicio_3/index.html" class="nav-btn primary">Siguiente (Push SW) →</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Intro -->
+    <div class="hero">
+      <span class="hero-badge">Web APIs • Media Capture & Streams</span>
+      <h1 class="hero-title">Captura de Medios con Cámara Web / Móvil</h1>
+      <p class="hero-subtitle">
+        Acceso al hardware óptico del dispositivo mediante <code>navigator.mediaDevices.getUserMedia</code>, renderizado del flujo en vivo en <code>&lt;video&gt;</code> y congelamiento de fotogramas estáticos en un <code>&lt;canvas&gt;</code>.
+      </p>
+    </div>
+
+    <!-- Feedback Alerts -->
+    <div id="cameraAlert" class="alert alert-info" style="display: none;">
+      <span class="alert-icon">ℹ️</span>
+      <span id="cameraAlertMsg">Cámara lista.</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Left Column: Video Feed & Controls -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">📹</span>
+              <span>Flujo de Video en Vivo (&lt;video&gt;)</span>
+            </h2>
+            <span id="streamBadge" class="badge badge-denied">
+              <span class="badge-dot"></span>
+              <span id="streamBadgeText">Cámara inactiva</span>
+            </span>
+          </div>
+
+          <!-- Video Viewport -->
+          <div class="media-viewport">
+            <div id="videoPlaceholder" class="video-placeholder">
+              <span class="icon">📷</span>
+              <h3 style="color: var(--text-main); margin-bottom: 0.25rem;">Cámara apagada</h3>
+              <p style="font-size: 0.85rem; max-width: 280px;">
+                Presiona <strong>"Iniciar Cámara"</strong> para solicitar permiso de video y visualizar la transmisión.
+              </p>
+            </div>
+            <video id="videoFeed" autoplay playsinline muted style="display: none;"></video>
+            
+            <div id="liveIndicators" class="video-overlay" style="display: none;">
+              <span class="badge badge-granted" style="background: rgba(22, 163, 74, 0.8); color: white;">
+                🔴 EN VIVO
+              </span>
+            </div>
+          </div>
+
+          <!-- Camera Settings & Hardware Selection -->
+          <div style="margin-top: 1rem;">
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+              <label class="form-label" for="cameraSelect">Seleccionar Dispositivo de Video:</label>
+              <select id="cameraSelect" class="form-control">
+                <option value="">Detectando cámaras...</option>
+              </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="chkMirror" checked style="accent-color: var(--primary);">
+                <span>Modo espejo (Flip horizontal)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="chkHD" checked style="accent-color: var(--primary);">
+                <span>Preferir Alta Definición (1080p/720p)</span>
+              </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-group">
+              <button id="btnStartCamera" class="btn btn-primary" style="flex: 1;">
+                ▶️ Iniciar Cámara
+              </button>
+              <button id="btnStopCamera" class="btn btn-danger" disabled>
+                ⏹️ Detener Cámara
+              </button>
+              <button id="btnSwitchFacing" class="btn btn-secondary" title="Alternar frontal/trasera en móviles">
+                🔄 Cambiar Lente
+              </button>
+            </div>
+
+            <div style="margin-top: 1rem;">
+              <button id="btnCapturePhoto" class="btn btn-success" style="width: 100%; font-size: 1.05rem; padding: 0.85rem;" disabled>
+                📸 Capturar Fotografía al Canvas
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Technical Telemetry Box -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">⚙️</span>
+              <span>Propiedades del MediaStreamTrack</span>
+            </h2>
+          </div>
+          <div class="coords-grid">
+            <div class="stat-card">
+              <span class="stat-label">Resolución</span>
+              <span class="stat-value" id="valRes">-- x --</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Tasa de Cuadros</span>
+              <span class="stat-value" id="valFps">-- fps</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Relación de Aspecto</span>
+              <span class="stat-value" id="valAspect">--</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Lente Activo</span>
+              <span class="stat-value" id="valFacing" style="font-size: 1rem;">--</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Canvas Output, Filters & Gallery -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Canvas Snapshot Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">🖼️</span>
+              <span>Fotografía Estática en HTML &lt;canvas&gt;</span>
+            </h2>
+            <button id="btnDownloadPhoto" class="btn btn-primary btn-sm" disabled>
+              💾 Descargar PNG
+            </button>
+          </div>
+
+          <!-- Canvas Viewport -->
+          <div class="media-viewport">
+            <div id="canvasPlaceholder" class="video-placeholder">
+              <span class="icon">🎨</span>
+              <h3 style="color: var(--text-main); margin-bottom: 0.25rem;">Sin captura activa</h3>
+              <p style="font-size: 0.85rem; max-width: 260px;">
+                Toma una foto para proyectar el fotograma instantáneo sobre este elemento <code>&lt;canvas&gt;</code>.
+              </p>
+            </div>
+            <canvas id="photoCanvas" style="display: none;"></canvas>
+          </div>
+
+          <!-- Filters Selector -->
+          <div style="margin-top: 1rem;">
+            <label class="form-label">Aplicar Filtro al Fotograma:</label>
+            <div class="filter-pills">
+              <button class="filter-btn active" data-filter="none">Normal</button>
+              <button class="filter-btn" data-filter="grayscale(100%)">Blanco y Negro</button>
+              <button class="filter-btn" data-filter="sepia(100%)">Sepia</button>
+              <button class="filter-btn" data-filter="invert(100%)">Invertir</button>
+              <button class="filter-btn" data-filter="contrast(175%) brightness(110%)">Vibrante</button>
+              <button class="filter-btn" data-filter="blur(3px)">Desenfoque</button>
+            </div>
+          </div>
+
+          <!-- Captured Gallery -->
+          <div style="margin-top: 1.25rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">
+                🎞️ Galería de Capturas de la Sesión (<span id="galleryCount">0</span>)
+              </h3>
+              <button id="btnClearGallery" class="btn btn-secondary btn-sm" style="display: none;">
+                Vaciar
+              </button>
+            </div>
+            <div id="galleryContainer" class="gallery-grid">
+              <p id="emptyGalleryMsg" style="color: var(--text-dim); font-size: 0.85rem; grid-column: 1 / -1; text-align: center; padding: 1rem;">
+                No hay capturas recientes en esta sesión.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Technical Code Box -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">💻</span>
+              <span>Web APIs de Cámara & Canvas</span>
+            </h2>
+          </div>
+          <pre class="code-box"><code>// 1. Obtener flujo de la cámara
+const stream = await navigator.mediaDevices.getUserMedia({
+  video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+  audio: false
+});
+videoElement.srcObject = stream;
+
+// 2. Congelar fotograma en el Canvas
+const ctx = canvasElement.getContext('2d');
+canvasElement.width = videoElement.videoWidth;
+canvasElement.height = videoElement.videoHeight;
+ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+// 3. Exportar como imagen estática
+const imageUri = canvasElement.toDataURL('image/png');</code></pre>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>Portafolio de Ejercicios 2 • PWA Avanzado • <strong>Ejercicio 2</strong></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

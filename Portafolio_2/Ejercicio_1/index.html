@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 1 - Consulta de Permisos y Geolocalización | Portafolio 2 PWA</title>
+  
+  <!-- Global & Local Styles -->
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Leaflet CSS for Interactive Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <a href="../index.html" class="brand">
+        <span class="brand-icon">📍</span>
+        <span>Ejercicio 1: Geolocalización & Permisos</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="../index.html" class="nav-btn">← Volver al Portafolio</a></li>
+          <li><a href="../Ejercicio_2/index.html" class="nav-btn primary">Siguiente (Cámara) →</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Intro -->
+    <div class="hero">
+      <span class="hero-badge">Web APIs • Hardware & Permissions</span>
+      <h1 class="hero-title">Consulta de Permisos y Geolocalización</h1>
+      <p class="hero-subtitle">
+        Verificación en tiempo real del estado de permisos con la <code>Permissions API</code> y captura de posición satelital con <code>Geolocation API</code> renderizada en mapa interactivo.
+      </p>
+    </div>
+
+    <!-- Feedback Alerts -->
+    <div id="statusAlert" class="alert alert-info" style="display: none;">
+      <span class="alert-icon">ℹ️</span>
+      <span id="statusAlertMsg">Listo para consultar ubicación.</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Left Column: Permissions & Controls -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Card 1: Permissions API Status -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">🛡️</span>
+              <span>Permissions API (navigator.permissions)</span>
+            </h2>
+            <button id="btnRefreshPerm" class="btn btn-secondary btn-sm" title="Re-consultar permisos">
+              🔄 Actualizar
+            </button>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem;">
+              Estado del permiso de geolocalización detectado por <code>navigator.permissions.query({ name: 'geolocation' })</code>:
+            </p>
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15,23,42,0.4); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <span style="font-weight: 600;">Permiso Geolocalización:</span>
+              <span id="permBadge" class="badge badge-prompt permission-pill">
+                <span class="badge-dot"></span>
+                <span id="permText">Consultando...</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="alert alert-info" style="margin-bottom: 1rem; font-size: 0.85rem;">
+            <span>💡</span>
+            <div>
+              <strong>Detector dinámico activo:</strong> Se implementó <code>permissionStatus.onchange</code>. Si cambias los permisos en el candado del navegador, la interfaz se actualizará al instante.
+            </div>
+          </div>
+
+          <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">
+            Otros permisos disponibles en este navegador:
+          </h3>
+          <div class="other-permissions-grid">
+            <div class="perm-item">
+              <span>Cámara:</span>
+              <span id="permCamera" class="badge badge-secondary btn-sm">...</span>
+            </div>
+            <div class="perm-item">
+              <span>Notificaciones:</span>
+              <span id="permNotifications" class="badge badge-secondary btn-sm">...</span>
+            </div>
+            <div class="perm-item">
+              <span>Portapapeles:</span>
+              <span id="permClipboard" class="badge badge-secondary btn-sm">...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 2: Geolocation Action Controls -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">🛰️</span>
+              <span>Acceso al GPS (Geolocation API)</span>
+            </h2>
+          </div>
+
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Ejecuta <code>navigator.geolocation.getCurrentPosition()</code> solicitando coordenadas precisas del hardware del dispositivo.
+          </p>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.9rem;">
+              <input type="checkbox" id="chkHighAccuracy" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
+              <span>Activar Alta Precisión (<code>enableHighAccuracy: true</code>)</span>
+            </label>
+          </div>
+
+          <div class="btn-group">
+            <button id="btnGetLocation" class="btn btn-primary" style="flex: 1;">
+              📍 Obtener Ubicación Actual
+            </button>
+            <button id="btnWatchLocation" class="btn btn-secondary">
+              ⏱️ Seguir en tiempo real
+            </button>
+            <button id="btnStopWatch" class="btn btn-danger" style="display: none;">
+              ⏹️ Detener
+            </button>
+          </div>
+        </section>
+
+        <!-- Card 3: Detailed Coordinates -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">📊</span>
+              <span>Datos Telemétricos Obtenidos</span>
+            </h2>
+            <button id="btnCopyCoords" class="btn btn-secondary btn-sm" disabled>
+              📋 Copiar
+            </button>
+          </div>
+
+          <div class="coords-grid">
+            <div class="stat-card">
+              <span class="stat-label">Latitud</span>
+              <span class="stat-value" id="valLat">--</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Longitud</span>
+              <span class="stat-value" id="valLng">--</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Precisión</span>
+              <span class="stat-value" id="valAccuracy">--</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Altitud</span>
+              <span class="stat-value" id="valAltitude">--</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Velocidad</span>
+              <span class="stat-value" id="valSpeed">--</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Última Lectura</span>
+              <span class="stat-value" id="valTimestamp" style="font-size: 0.9rem;">--</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Interactive Map -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <section class="card" style="height: 100%; display: flex; flex-direction: column;">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="icon">🗺️</span>
+              <span>Mapa Interactivo (Leaflet + OpenStreetMap)</span>
+            </h2>
+            <div class="btn-group">
+              <button id="btnRecenter" class="btn btn-secondary btn-sm" disabled title="Centrar mapa en la posición actual">
+                🎯 Centrar
+              </button>
+              <a id="btnExternalMap" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display: none;" title="Abrir en OpenStreetMap">
+                ↗️ Abrir en mapa web
+              </a>
+            </div>
+          </div>
+
+          <!-- Leaflet Map Container -->
+          <div id="mapContainer">
+            <div id="mapPlaceholder" class="map-placeholder">
+              <span class="icon">🌍</span>
+              <h3 style="color: var(--text-main); margin-bottom: 0.5rem;">Mapa a la espera de coordenadas</h3>
+              <p style="font-size: 0.9rem; max-width: 320px;">
+                Presiona <strong>"Obtener Ubicación Actual"</strong> para conceder permisos y cargar tu punto geográfico en el mapa satelital.
+              </p>
+            </div>
+            <div id="leafletMap" style="height: 100%; width: 100%; display: none;"></div>
+          </div>
+
+          <!-- Technical API Reference Box -->
+          <div style="margin-top: 1.25rem;">
+            <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">
+              Código Web API utilizado:
+            </h3>
+            <pre class="code-box"><code>// 1. Verificación de permiso:
+const status = await navigator.permissions.query({ name: 'geolocation' });
+status.onchange = () => console.log('Nuevo estado:', status.state);
+
+// 2. Extracción de coordenadas GPS:
+navigator.geolocation.getCurrentPosition(
+  pos => {
+    const { latitude, longitude, accuracy } = pos.coords;
+  },
+  err => console.error(err.message),
+  { enableHighAccuracy: true, timeout: 10000 }
+);</code></pre>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>Portafolio de Ejercicios 2 • PWA Avanzado • <strong>Ejercicio 1</strong></p>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
