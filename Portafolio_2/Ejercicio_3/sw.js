@@ -78,3 +78,4 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('notificationclose', (event) => {
   console.log('[Service Worker] Notificación cerrada por el usuario:', event.notification.tag);
 });
+

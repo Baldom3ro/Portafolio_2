@@ -46,3 +46,4 @@ Este ejercicio implementa las capacidades multimedia de una Aplicación Web Prog
 5. Haz clic en **"📸 Capturar Fotografía al Canvas"** para congelar el fotograma actual.
 6. Selecciona cualquier filtro fotográfico (ej. *Sepia* o *Blanco y Negro*) y haz clic en **"💾 Descargar PNG"** para guardar la foto localmente.
 7. Presiona **"⏹️ Detener Cámara"** para verificar que el hardware se apague correctamente (el led indicador de la cámara se apagará).
+

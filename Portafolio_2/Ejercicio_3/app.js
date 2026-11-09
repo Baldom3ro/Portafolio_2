@@ -273,3 +273,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePermissionUI();
   updateMockup();
 });
+

@@ -47,3 +47,4 @@ Este ejercicio implementa capacidades avanzadas de una Aplicación Web Progresiv
 3. Haz clic en **"Obtener Ubicación Actual"** y acepta el diálogo de permisos del navegador.
 4. Observa cómo el badge de permisos cambia a verde (`granted`) y el mapa se centra instantáneamente en tu posición.
 5. Haz clic en el icono del candado en la barra de direcciones de tu navegador para revocar el permiso y nota cómo el detector `onchange` actualiza la UI automáticamente a `denied`.
+

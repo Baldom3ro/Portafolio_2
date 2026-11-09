@@ -51,3 +51,4 @@ Este ejercicio implementa almacenamiento estructurado y transaccional del lado d
 5. Edita o elimina cualquier registro y observa la persistencia.
 6. **Prueba Offline**: Desconecta tu conexión Wi-Fi / cable de red o activa el modo "Offline" en las herramientas de desarrollador (*F12 > Network > Offline*).
 7. Recarga la página: todos los registros seguirán intactos y podrás continuar agregando, modificando y eliminando datos sin ningún error ni necesidad de conexión a internet.
+

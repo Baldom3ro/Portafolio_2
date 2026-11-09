@@ -51,3 +51,4 @@ Este ejercicio implementa una arquitectura avanzada de resiliencia y disponibili
    - Los productos continuarán visibles y utilizables, indicando la fecha y hora exacta en que fueron respaldados localmente en IndexedDB.
 5. Haz clic en **"🔄 Actualizar Datos (Fetch)"** con el modo sin red activo: la aplicación intentará la red, detectará la desconexión y aplicará el fallback a IndexedDB de manera transparente.
 6. Desactiva el interruptor y vuelve a presionar el botón: la aplicación volverá automáticamente a tomar los datos frescos de la red.
+

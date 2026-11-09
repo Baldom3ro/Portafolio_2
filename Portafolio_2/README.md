@@ -107,3 +107,4 @@ Portafolio_2/
    ```
 
 4. Explora el panel interactivo y navega entre los 5 ejercicios prácticos.
+

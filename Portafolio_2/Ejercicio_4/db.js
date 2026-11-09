@@ -223,3 +223,4 @@ class DatabaseManager {
 
 // Exportar instancia global
 window.dbManager = new DatabaseManager();
+

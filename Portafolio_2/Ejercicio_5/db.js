@@ -90,3 +90,4 @@ class ApiCacheDB {
 }
 
 window.apiCacheDB = new ApiCacheDB();
+

@@ -55,3 +55,4 @@ Este ejercicio demuestra la integración entre la **API de Notificaciones**, la 
 6. Haz clic en **"🚀 Disparar Notificación con Service Worker"**.
 7. Cambia inmediatamente a otra pestaña o minimiza tu navegador: verás cómo la notificación nativa se dispara en la bandeja de tu sistema operativo con su icono y botones de acción.
 8. Al hacer clic sobre la notificación, el Service Worker te llevará de vuelta a la aplicación enfocarla.
+
